@@ -1,5 +1,5 @@
 ## SudokuBoard
-Sudoku solver for Java using backtracking. Finds correct size based on input. Call solve to solve board.
+Sudoku solver for Java using a greedy solve plus backtracking. Finds correct size based on input. Call `solve()` on an instance to solve board.
 
 ```java
 class SolveBoard {
@@ -32,5 +32,4 @@ Output
 ```
 
 ## Future improvements
-* Generate set for constraining numbers
-* Try greedy solves before backtracking
+Tune performance by introducing new solve methods before bruteforcing with backtracking

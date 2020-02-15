@@ -1,6 +1,6 @@
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class SudokuBoardTest {
@@ -205,7 +205,7 @@ public class SudokuBoardTest {
         SudokuBoard board = new SudokuBoard(input);
         board.solve();
         assertArrayEquals(solution, input);
-    }    
+    }
 
     @Test
     public void hard_3x4() {
@@ -245,50 +245,6 @@ public class SudokuBoardTest {
         assertArrayEquals(solution, input);
     }
 
-    @Test
-    public void hard_3x5() {
-        // Pretty tough to solve takes 4-5 minutes
-        // http://www.menneske.no/sudoku/3x5/solution.html?number=2894
-        int[][] input = {
-                {0, 15, 0, 0, 0, 0, 0, 1, 0, 12, 14, 10, 0, 9, 0},
-                {0, 0, 12, 0, 9, 0, 0, 4, 0, 0, 11, 0, 0, 0, 6},
-                {7, 6, 0, 0, 0, 10, 0, 11, 0, 13, 0, 1, 0, 0, 2},
-                {5, 0, 3, 0, 0, 7, 0, 0, 0, 0, 0, 13, 0, 6, 0},
-                {0, 8, 0, 4, 0, 0, 0, 0, 5, 2, 12, 0, 0, 1, 0},
-                {0, 0, 0, 1, 0, 0, 0, 14, 6, 15, 0, 0, 0, 0, 9},
-                {11, 3, 0, 15, 0, 0, 0, 0, 0, 4, 7, 0, 0, 0, 1},
-                {0, 7, 6, 0, 8, 2, 0, 10, 0, 11, 13, 0, 15, 14, 0},
-                {10, 0, 0, 0, 1, 8, 0, 0, 0, 0, 0, 9, 0, 2, 12},
-                {8, 0, 0, 0, 0, 1, 9, 3, 0, 0, 0, 4, 0, 0, 0},
-                {0, 14, 0, 0, 2, 13, 8, 0, 0, 0, 0, 15, 0, 3, 0},
-                {0, 4, 0, 7, 0, 0, 0, 0, 0, 6, 0, 0, 8, 0, 14},
-                {15, 0, 0, 3, 0, 4, 0, 13, 0, 8, 0, 0, 0, 12, 7},
-                {12, 0, 0, 0, 14, 0, 0, 6, 0, 0, 15, 0, 4, 0, 0},
-                {0, 9, 0, 2, 4, 15, 0, 12, 0, 0, 0, 0, 0, 5, 0}
-        };
-
-        int[][] solution = {
-                {4, 15, 13, 11, 3, 6, 7, 1, 2, 12, 14, 10, 5, 9, 8},
-                {2, 1, 12, 10, 9, 14, 3, 4, 8, 5, 11, 7, 13, 15, 6},
-                {7, 6, 14, 8, 5, 10, 15, 11, 9, 13, 3, 1, 12, 4, 2},
-                {5, 12, 3, 9, 15, 7, 4, 8, 11, 1, 2, 13, 14, 6, 10},
-                {14, 8, 10, 4, 6, 3, 13, 9, 5, 2, 12, 11, 7, 1, 15},
-                {13, 2, 11, 1, 7, 12, 10, 14, 6, 15, 4, 5, 3, 8, 9},
-                {11, 3, 2, 15, 12, 9, 14, 5, 13, 4, 7, 8, 6, 10, 1},
-                {9, 7, 6, 5, 8, 2, 12, 10, 1, 11, 13, 3, 15, 14, 4},
-                {10, 13, 4, 14, 1, 8, 6, 15, 3, 7, 5, 9, 11, 2, 12},
-                {8, 11, 15, 6, 13, 1, 9, 3, 12, 14, 10, 4, 2, 7, 5},
-                {1, 14, 5, 12, 2, 13, 8, 7, 4, 10, 6, 15, 9, 3, 11},
-                {3, 4, 9, 7, 10, 11, 5, 2, 15, 6, 1, 12, 8, 13, 14},
-                {15, 5, 1, 3, 11, 4, 2, 13, 14, 8, 9, 6, 10, 12, 7},
-                {12, 10, 8, 13, 14, 5, 1, 6, 7, 9, 15, 2, 4, 11, 3},
-                {6, 9, 7, 2, 4, 15, 11, 12, 10, 3, 8, 14, 1, 5, 13}
-        };
-
-        SudokuBoard board = new SudokuBoard(input);
-        board.solve();
-        assertArrayEquals(solution, input);
-    }
 
     @Test
     public void hard_4x4() {
@@ -336,8 +292,86 @@ public class SudokuBoardTest {
         assertArrayEquals(solution, input);
     }
 
+    @Test
+    public void throwsIllegalBoardSize() {
+        int[][] input = {{1}, {0}};
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            SudokuBoard board = new SudokuBoard(input);
+        });
+        String expectedMessage = "Could not set box bounds for boardsize 2x2";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    public void testToString() {
+        int[][] input = {
+                {0, 1, 0, 0},
+                {0, 2, 0, 0},
+                {0, 0, 3, 0},
+                {0, 0, 1, 0}
+        };
+        SudokuBoard board = new SudokuBoard(input);
+        String expectedString = "_1 __\n_2 __\n\n__ 3_\n__ 1_";
+        String actualString = board.toString();
+
+        assertEquals(expectedString, actualString);
+
+    }
+
+
+}
+
+class SudokuBoardPerformanceTests {
+
+    @Test
+    public void hard_3x5() {
+        // Pretty tough to solve takes 4-5 minutes
+        // http://www.menneske.no/sudoku/3x5/solution.html?number=2894
+        int[][] input = {
+                {0, 15, 0, 0, 0, 0, 0, 1, 0, 12, 14, 10, 0, 9, 0},
+                {0, 0, 12, 0, 9, 0, 0, 4, 0, 0, 11, 0, 0, 0, 6},
+                {7, 6, 0, 0, 0, 10, 0, 11, 0, 13, 0, 1, 0, 0, 2},
+                {5, 0, 3, 0, 0, 7, 0, 0, 0, 0, 0, 13, 0, 6, 0},
+                {0, 8, 0, 4, 0, 0, 0, 0, 5, 2, 12, 0, 0, 1, 0},
+                {0, 0, 0, 1, 0, 0, 0, 14, 6, 15, 0, 0, 0, 0, 9},
+                {11, 3, 0, 15, 0, 0, 0, 0, 0, 4, 7, 0, 0, 0, 1},
+                {0, 7, 6, 0, 8, 2, 0, 10, 0, 11, 13, 0, 15, 14, 0},
+                {10, 0, 0, 0, 1, 8, 0, 0, 0, 0, 0, 9, 0, 2, 12},
+                {8, 0, 0, 0, 0, 1, 9, 3, 0, 0, 0, 4, 0, 0, 0},
+                {0, 14, 0, 0, 2, 13, 8, 0, 0, 0, 0, 15, 0, 3, 0},
+                {0, 4, 0, 7, 0, 0, 0, 0, 0, 6, 0, 0, 8, 0, 14},
+                {15, 0, 0, 3, 0, 4, 0, 13, 0, 8, 0, 0, 0, 12, 7},
+                {12, 0, 0, 0, 14, 0, 0, 6, 0, 0, 15, 0, 4, 0, 0},
+                {0, 9, 0, 2, 4, 15, 0, 12, 0, 0, 0, 0, 0, 5, 0}
+        };
+
+        int[][] solution = {
+                {4, 15, 13, 11, 3, 6, 7, 1, 2, 12, 14, 10, 5, 9, 8},
+                {2, 1, 12, 10, 9, 14, 3, 4, 8, 5, 11, 7, 13, 15, 6},
+                {7, 6, 14, 8, 5, 10, 15, 11, 9, 13, 3, 1, 12, 4, 2},
+                {5, 12, 3, 9, 15, 7, 4, 8, 11, 1, 2, 13, 14, 6, 10},
+                {14, 8, 10, 4, 6, 3, 13, 9, 5, 2, 12, 11, 7, 1, 15},
+                {13, 2, 11, 1, 7, 12, 10, 14, 6, 15, 4, 5, 3, 8, 9},
+                {11, 3, 2, 15, 12, 9, 14, 5, 13, 4, 7, 8, 6, 10, 1},
+                {9, 7, 6, 5, 8, 2, 12, 10, 1, 11, 13, 3, 15, 14, 4},
+                {10, 13, 4, 14, 1, 8, 6, 15, 3, 7, 5, 9, 11, 2, 12},
+                {8, 11, 15, 6, 13, 1, 9, 3, 12, 14, 10, 4, 2, 7, 5},
+                {1, 14, 5, 12, 2, 13, 8, 7, 4, 10, 6, 15, 9, 3, 11},
+                {3, 4, 9, 7, 10, 11, 5, 2, 15, 6, 1, 12, 8, 13, 14},
+                {15, 5, 1, 3, 11, 4, 2, 13, 14, 8, 9, 6, 10, 12, 7},
+                {12, 10, 8, 13, 14, 5, 1, 6, 7, 9, 15, 2, 4, 11, 3},
+                {6, 9, 7, 2, 4, 15, 11, 12, 10, 3, 8, 14, 1, 5, 13}
+        };
+
+        SudokuBoard board = new SudokuBoard(input);
+        board.solve();
+        assertArrayEquals(solution, input);
+    }
+
     // Too hard to solve without optimizations
-    // @Test
+    @Test
     public void hard_5x5() {
         // http://www.menneske.no/sudoku/5/solution.html?number=4821
         int[][] input = {
