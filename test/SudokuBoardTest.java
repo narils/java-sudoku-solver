@@ -294,13 +294,15 @@ public class SudokuBoardTest {
 
     @Test
     public void throwsIllegalBoardSize() {
-        int[][] input = {{1}, {0}};
+        int[][] input = {
+                {1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7},
+                {1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7},
+        };
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             SudokuBoard board = new SudokuBoard(input);
         });
-        String expectedMessage = "Could not set box bounds for boardsize 2x2";
+        String expectedMessage = "Could not set box bounds for boardsize 7x7";
         String actualMessage = exception.getMessage();
-
         assertTrue(actualMessage.contains(expectedMessage));
     }
 
@@ -320,7 +322,82 @@ public class SudokuBoardTest {
 
     }
 
+    @Test
+    public void throwsIllegalRowLength() {
+        int[][] input = {
+                {0, 1, 0, 0},
+                {0, 2, 0, 1},
+                {0, 3, 0},
+                {0, 3, 1, 2}
+        };
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            SudokuBoard board = new SudokuBoard(input);
+        });
+        String expectedMessage = "Row 3 is not of proper size (4)";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
 
+    @Test
+    public void getBoardReturnsInputArray() {
+        int[][] input = {
+                {1, 0, 0, 6, 0, 2, 0, 7, 0},
+                {2, 6, 0, 9, 0, 0, 1, 0, 0},
+                {0, 0, 7, 0, 0, 0, 0, 0, 0},
+                {0, 8, 0, 4, 0, 0, 0, 0, 7},
+                {0, 7, 1, 3, 0, 8, 2, 5, 0},
+                {9, 0, 0, 0, 0, 7, 0, 1, 0},
+                {0, 0, 0, 0, 0, 0, 4, 0, 0},
+                {0, 0, 4, 0, 0, 6, 0, 2, 3},
+                {0, 2, 0, 1, 0, 4, 0, 0, 6}
+        };
+
+        SudokuBoard board = new SudokuBoard(input);
+        board.solve();
+        assertEquals(input, board.getBoard());
+    }
+
+    @Test
+    public void solveMultipleBoards() {
+        int[][] input1 = {
+                {0, 1, 0, 0},
+                {0, 2, 0, 0},
+                {0, 0, 3, 0},
+                {0, 0, 1, 0}
+        };
+        int[][] solution1 = {
+                {4, 1, 2, 3},
+                {3, 2, 4, 1},
+                {1, 4, 3, 2},
+                {2, 3, 1, 4}
+        };
+        int[][] input2 = {
+                {0, 0, 0, 5, 0, 4},
+                {0, 0, 0, 0, 2, 6},
+                {0, 0, 0, 2, 0, 5},
+                {2, 0, 5, 0, 0, 0},
+                {3, 2, 0, 0, 0, 0},
+                {1, 0, 4, 0, 0, 0}
+        };
+        int[][] solution2 = {
+                {6, 3, 2, 5, 1, 4},
+                {5, 4, 1, 3, 2, 6},
+                {4, 1, 3, 2, 6, 5},
+                {2, 6, 5, 1, 4, 3},
+                {3, 2, 6, 4, 5, 1},
+                {1, 5, 4, 6, 3, 2}
+        };
+
+        SudokuBoard board = new SudokuBoard();
+        board.setBoard(input1);
+        board.solve();
+
+        board.setBoard(input2);
+        board.solve();
+
+        assertArrayEquals(solution1, input1);
+        assertArrayEquals(solution2, input2);
+    }
 }
 
 class SudokuBoardPerformanceTests {

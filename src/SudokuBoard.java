@@ -8,36 +8,52 @@ import java.util.Set;
 public class SudokuBoard {
     private int[][] board;
     private final int EMPTY = 0;
-    private final int size;
-    private final int boxWidth;
-    private final int boxHeight;
+    private int SIZE, BOX_WIDTH, BOX_HEIGHT;
     private Set<Integer> possibleNumbers;
 
-    private int[] getBoxBounds() {
-        int[] boxSizes = {0, 0};
-
+    private void setBoxBounds() {
         // find highest int first, this should be set as the width.
-        int startInt = (int) Math.ceil(Math.sqrt(size));
-        for (int i = 0; i < size - startInt; i++) {
+        int startInt = (int) Math.ceil(Math.sqrt(SIZE));
+        for (int i = 0; i < SIZE - startInt; i++) {
             int width = startInt + i;
-            if (size % width == 0) {
-                boxSizes[0] = width;
-                boxSizes[1] = size / width;
-                return boxSizes;
+            if (SIZE % width == 0) {
+                BOX_WIDTH = width;
+                BOX_HEIGHT = SIZE / width;
+                return;
             }
         }
-        throw new IllegalArgumentException("Could not set box bounds for boardsize " + size + "x" + size);
+        throw new IllegalArgumentException("Could not set box bounds for boardsize " + SIZE + "x" + SIZE);
+    }
+
+    public SudokuBoard() {
     }
 
     public SudokuBoard(@NotNull int[][] board) throws IllegalArgumentException {
-        this.board = board;
-        size = board.length;
-        int[] boxSizes = getBoxBounds();
-        boxWidth = boxSizes[0];
-        boxHeight = boxSizes[1];
+        setBoard(board);
+    }
 
+    public void setBoard(@NotNull int[][] board) throws IllegalArgumentException {
+        this.board = board;
+        setup(board);
+    }
+
+    public int[][] getBoard() {
+        return board;
+    }
+
+    private void setup(@NotNull int[][] board) {
+        SIZE = board.length;
+
+        for (int rowIdx = 0; rowIdx < SIZE; rowIdx++) {
+            int[] colArray = board[rowIdx];
+            if (colArray.length != SIZE) {
+                throw new IllegalArgumentException("Row " + (rowIdx + 1) + " is not of proper size (" + SIZE + ")");
+            }
+        }
+
+        setBoxBounds();
         possibleNumbers = new HashSet<>();
-        for (int i = 1; i < size + 1; i++) {
+        for (int i = 1; i < SIZE + 1; i++) {
             possibleNumbers.add(i);
         }
     }
@@ -45,7 +61,7 @@ public class SudokuBoard {
     private Set<Integer> getConstraints(int row, int col) {
         Set<Integer> seenNumbers = new HashSet<>();
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < SIZE; i++) {
             int rowValue = board[row][i];
             int colValue = board[i][col];
 
@@ -53,11 +69,11 @@ public class SudokuBoard {
             if (colValue != 0) seenNumbers.add(colValue);
         }
 
-        int rowStart = (row / boxHeight) * boxHeight;
-        int colStart = (col / boxWidth) * boxWidth;
+        int rowStart = row - row % BOX_HEIGHT;
+        int colStart = col - col % BOX_WIDTH;
 
-        for (int rowIdx = rowStart; rowIdx < rowStart + boxHeight; rowIdx++) {
-            for (int colIdx = colStart; colIdx < colStart + boxWidth; colIdx++) {
+        for (int rowIdx = rowStart; rowIdx < rowStart + BOX_HEIGHT; rowIdx++) {
+            for (int colIdx = colStart; colIdx < colStart + BOX_WIDTH; colIdx++) {
                 int boxValue = board[rowIdx][colIdx];
                 if (boxValue != 0) seenNumbers.add(boxValue);
             }
@@ -67,11 +83,11 @@ public class SudokuBoard {
 
     private List<GreedyPair> greedySolve() {
         List<GreedyPair> greedySolves = new LinkedList<>();
-        for (int row = 0; row < size; row++) {
-            for (int col = 0; col < size; col++) {
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
                 if (board[row][col] == EMPTY) {
                     Set<Integer> constraint = getConstraints(row, col);
-                    if (constraint.size() == size - 1) {
+                    if (constraint.size() == SIZE - 1) {
                         Set<Integer> numbers = new HashSet<>(possibleNumbers);
                         numbers.removeAll(constraint);
                         for (int num : numbers) {
@@ -94,8 +110,8 @@ public class SudokuBoard {
     public boolean solve() {
         List<GreedyPair> greedySolves = greedySolve();
 
-        for (int row = 0; row < size; row++) {
-            for (int col = 0; col < size; col++) {
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
                 if (board[row][col] == EMPTY) {
                     Set<Integer> constraint = getConstraints(row, col);
                     Set<Integer> numbers = new HashSet<>(possibleNumbers);
@@ -123,20 +139,20 @@ public class SudokuBoard {
     public String toString() {
         StringBuilder output = new StringBuilder();
 
-        for (int row = 0; row < size; row++) {
+        for (int row = 0; row < SIZE; row++) {
             if (row > 0) {
                 output.append('\n');
             }
 
-            if (row != 0 && row % boxHeight == 0) {
+            if (row != 0 && row % BOX_HEIGHT == 0) {
                 output.append('\n');
             }
 
-            for (int col = 0; col < size; col++) {
+            for (int col = 0; col < SIZE; col++) {
                 int val = board[row][col];
                 output.append(val == EMPTY ? "_" : val);
 
-                if ((col + 1) % boxWidth == 0 && col + 1 != size) {
+                if ((col + 1) % BOX_WIDTH == 0 && col + 1 != SIZE) {
                     output.append(" ");
                 }
             }
@@ -146,8 +162,7 @@ public class SudokuBoard {
 }
 
 class GreedyPair {
-    public final int row;
-    public final int col;
+    public final int row, col;
 
     public GreedyPair(int row, int col) {
         this.row = row;
